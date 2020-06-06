@@ -126,6 +126,11 @@ a {
 	flex: 1;
 }
 
+#msg:focus {
+	outline: none !important;
+	border: 1px solid red;
+}
+
 /* Join Page */
 .join-container {
 	max-width: 500px;
