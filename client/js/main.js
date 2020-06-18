@@ -3,7 +3,7 @@ const socket = io();
 
 // Chat form element
 let chatForm = document.querySelector('#chat-form');
-// Chat room name
+// Chat room name element
 let room = document.querySelector('#room-name');
 
 // Get user name and room name from query string params
@@ -24,18 +24,24 @@ const getName_getRoom = () => {
     };
 };
 
+
 // When a user has joined a chat room, send user name & room name to server
 socket.emit('join_room', {userName: getName_getRoom().userName, room: getName_getRoom().roomName});
+
+// Get all users in a chat room
+socket.on('roomUsers', (users) => {
+    //printUsersInRoom(users); <----------------------- create this function that will show all the current users in chat room
+});
 
 // Change the displayed room name to match the room that was selected
 room.innerHTML = getName_getRoom().roomName;
 
 // When a user has left a chat room
-socket.emit('disconnect', {userName: getName_getRoom().userName});
+socket.emit('disconnect', {userName: getName_getRoom().userName, room: getName_getRoom().roomName});
 
 // Message from server
-socket.on('message', chat_message => {
-    printMessage(chat_message.userName, chat_message.message);
+socket.on('message', data => {
+    printMessage(data.userName, data.message);
 });
 
 // Message submit in chat
@@ -47,9 +53,10 @@ chatForm.addEventListener('submit', (event) => {
 
     // get user name
     const userName = getName_getRoom().userName;
+    const room = getName_getRoom().roomName;
     
     // Emitting the message to the server
-    socket.emit('chat_message', {userName: userName, message: chatMessage});
+    socket.emit('chat_message', {userName: userName, message: chatMessage, roomName: room});
 
     // Clear input field after message has sent - focus on input field
     event.target.elements.msg.value = '';
